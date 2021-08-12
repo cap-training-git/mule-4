@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="dfc7aef7-d7f8-4d24-a211-31a7b6479ce6" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="getOrderAPI" doc:id="455dfa76-3279-4deb-933f-d6ded3c4d91c" >
+		<http:listener doc:name="Listener" doc:id="22a52855-4de6-4016-8c21-eb2808b2032c" config-ref="HTTP_Listener_config" path="/orders/get"/>
+		<logger level="INFO" doc:name="Logger" doc:id="dc252e58-1b53-48f4-b57d-5eab113660cc" message="#[correlationId]"/>
+		<set-payload value='#[%dw 2.0
+output application/json
+---
+{
+	"order1"	: "1",
+	"order2"	: "2"
+}]' doc:name="Set Payload" doc:id="110fe8b6-a36f-46c9-a4a7-4bfaa497043b" />
+	</flow>
+	<flow name="getProductsAPI" doc:id="b6cfb7f8-3313-471b-9189-790a3eb6b054" >
+		<http:listener doc:name="Listener" doc:id="c2829084-c354-4a90-8b7b-fead62427bc4" config-ref="HTTP_Listener_config" path="/orders/get/Product"/>
+		<set-payload value='#[%dw 2.0
+output application/json
+---
+{
+	"message" : "Triggered Product API"
+}]' doc:name="Set Payload" doc:id="5358aea9-2357-4c2a-9ae8-dfeb2595bfe6" />
+	</flow>
+	<flow name="createOrdersAPI" doc:id="22d5074b-cc16-4bb7-90b4-479a11ec29fe" >
+		<http:listener doc:name="Listener" doc:id="1ae0d15d-1063-4ed2-af0a-094bad34f015" config-ref="HTTP_Listener_config" path="/orders/create" allowedMethods="POST"/>
+		<set-payload value='#[%dw 2.0
+output application/json
+---
+{
+	"OrderId" : "1234"
+}]' doc:name="Set Payload" doc:id="e46eada1-f951-44c2-9f5a-478c165e47ae" />
+	</flow>
+	<flow name="orders-apiFlow" doc:id="3f0c0e11-12b3-491b-8093-2d88834deeed" >
+		<http:listener doc:name="Listener" doc:id="a0954a9c-0cbe-452c-9458-84b2f7fda641" config-ref="HTTP_Listener_config" path="/orders/get/{orderId}"/>
+		<choice doc:name="Choice" doc:id="046edf45-84cb-41aa-a9fb-27652d0edede" >
+			<when expression="#[attributes.uriParams.orderId == '10']">
+				<set-payload value='#[%dw 2.0
+output application/json
+---
+{
+	"Books": "10",
+	"Pen"  : "25"
+}]' doc:name="Set Payload" doc:id="d31aff15-3255-4346-a23b-5e3ff5d1aac0" />
+			</when>
+			<otherwise >
+				<raise-error doc:name="Raise error" doc:id="94b6e78e-150d-4925-968f-1de23d4c23ad" type="CUSTOM:NOT_FOUND"/>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>
