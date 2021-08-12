@@ -48,6 +48,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 		<logger level="INFO" doc:name="Logger"
 			doc:id="9e2268f5-53ba-480c-9266-e93351c5e07c"
 			message="#[correlationId]" />
+		<logger level="INFO" doc:name="Logger" doc:id="5fa285df-2bd9-45c1-a3f9-6ea6eeb2aa6b" message="For testing purpose"/>
 		<error-handler>
 			<on-error-propagate enableNotifications="true"
 				logException="true" doc:name="On Error Propagate"
